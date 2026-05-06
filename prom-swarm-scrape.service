@@ -1,0 +1,30 @@
+[Unit]
+Description=Docker Python Metrics
+Documentation=https://github.com/marcoszpf/prom-swarm-scrape
+After=network.target docker.service
+Wants=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+# User must be in docker group.
+User=root
+Group=root
+WorkingDirectory=/opt/prom-swarm-scrape
+ExecStart=/usr/bin/python3 /opt/prom-swarm-scrape/docker-python-scrape.py
+Restart=always
+RestartSec=10
+StandardOutput=null
+StandardError=journal
+SyslogIdentifier=prom-swarm-scrape
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/prom-swarm-scrape
+
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
