@@ -5,7 +5,7 @@ This scrape gets information of the cluster using the `/var/run/docker.sock` fil
 **Docker**
 
 ```bash
-docker build -p 9595:8080 -t prom-swarm-scrape:latest .
+docker build -p 9595:8080 -v /var/run/docker.sock:/var/run/docker.sock -t prom-swarm-scrape:latest .
 ```
 
 Default container port: 8080.
