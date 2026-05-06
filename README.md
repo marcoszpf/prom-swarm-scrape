@@ -63,9 +63,10 @@ Example of a cluster with 3 nodes:
 | swarm_services_total           | Gauge | Number                                               | Total number of services                                                                                                                                                                |
 | swarm_services_unstable_total  | Gauge | Number                                               | Total number of unstable services (replicas != desired)                                                                                                                                 |
 | swarm_stacks_total             | Gauge | Number                                               | Total number of stacks                                                                                                                                                                  |
+```text
+
 **Example**
 
-```text
 1)
 swarm_containers_status{state="running", stack="nginx", service_name="nginx_nginx", name="nginx_nginx.3.waqt4226uiwgbstl108c4f330", sho  
 rt_name="nginx_nginx.3"} 20365
@@ -82,3 +83,10 @@ swarm_services_status{service_name="loki_promtail", stack="loki"} 1
 
 Service "loki_promtail" of the stack="loki" was stopped (someone issued a docker service scale loki_promtail=0).
 ```
+
+## Dashboard
+
+File: Grafana_Docker_Swarm_Cluster_v1.json
+
+![Grafana Docker Swarm Dashboard](images/image1.png)
+![Grafana Docker Swarm Dashboard](images/image2.png)
