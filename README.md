@@ -63,10 +63,10 @@ Example of a cluster with 3 nodes:
 | swarm_services_total           | Gauge | Number                                               | Total number of services                                                                                                                                                                |
 | swarm_services_unstable_total  | Gauge | Number                                               | Total number of unstable services (replicas != desired)                                                                                                                                 |
 | swarm_stacks_total             | Gauge | Number                                               | Total number of stacks                                                                                                                                                                  |
+
+## Example
+
 ```text
-
-**Example**
-
 1)
 swarm_containers_status{state="running", stack="nginx", service_name="nginx_nginx", name="nginx_nginx.3.waqt4226uiwgbstl108c4f330", sho  
 rt_name="nginx_nginx.3"} 20365
