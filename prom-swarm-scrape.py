@@ -142,57 +142,82 @@ class MetricsHandler(http.server.BaseHTTPRequestHandler):
       prometheus_metrics.append('swarm_containers_status' + labels_str + ' ' + str(uptime_seconds))
 
   def do_GET(self):
-    prometheus_metrics = []
-    metrics_dict = {}
-    am_i_leader = False
+    if self.path == '/metrics':
+      prometheus_metrics = []
+      metrics_dict = {}
+      am_i_leader = False
 
-    metrics_dict['swarm_stacks_total'] = 0
-    metrics_dict['swarm_nodes_total'] = 0
-    metrics_dict['swarm_services_total'] = 0
-    metrics_dict['swarm_services_unstable_total'] = 0
-    metrics_dict['swarm_configs_total'] = 0
-    metrics_dict['swarm_secrets_total'] = 0
-    metrics_dict['swarm_containers_running_total'] = 0
-    metrics_dict['swarm_containers_exited_total'] = 0
+      metrics_dict['swarm_stacks_total'] = 0
+      metrics_dict['swarm_nodes_total'] = 0
+      metrics_dict['swarm_services_total'] = 0
+      metrics_dict['swarm_services_unstable_total'] = 0
+      metrics_dict['swarm_configs_total'] = 0
+      metrics_dict['swarm_secrets_total'] = 0
+      metrics_dict['swarm_containers_running_total'] = 0
+      metrics_dict['swarm_containers_exited_total'] = 0
 
-    try:
-      am_i_leader = self.check_if_leader()
+      try:
+        am_i_leader = self.check_if_leader()
 
-      if am_i_leader == True:
-        # Configs
-        metrics_dict['swarm_configs_total'] = len(self.server.client.configs.list())
+        if am_i_leader == True:
+          # Configs
+          metrics_dict['swarm_configs_total'] = len(self.server.client.configs.list())
 
-        # Secret
-        metrics_dict['swarm_secrets_total'] = len(self.server.client.secrets.list())
+          # Secret
+          metrics_dict['swarm_secrets_total'] = len(self.server.client.secrets.list())
 
-        # Nodes
-        self.nodes_metrics(metrics_dict, prometheus_metrics)
+          # Nodes
+          self.nodes_metrics(metrics_dict, prometheus_metrics)
 
-        # Services
-        self.services_metrics(metrics_dict, prometheus_metrics)
+          # Services
+          self.services_metrics(metrics_dict, prometheus_metrics)
 
-      self.containers_metrics(metrics_dict, prometheus_metrics)
-    except docker.errors.DockerException as e:
-      print(f"Error connecting to Docker socket: {e}")
+        self.containers_metrics(metrics_dict, prometheus_metrics)
+      except docker.errors.DockerException as e:
+        print(f"Error connecting to Docker socket: {e}")
 
-    for k in metrics_dict:
-      v = metrics_dict[k]
-      # Leader shows ALL metrics
-      if am_i_leader == True:
-        prometheus_metrics.append(f'{k} {v}')
-      # Workers only shows containers metrics (Change this!)
-      elif 'swarm_containers_' in k:
-        prometheus_metrics.append(f'{k} {v}')
+      for k in metrics_dict:
+        v = metrics_dict[k]
+        # Leader shows ALL metrics
+        if am_i_leader == True:
+          prometheus_metrics.append(f'{k} {v}')
+        # Workers only shows containers metrics (Change this!)
+        elif 'swarm_containers_' in k:
+          prometheus_metrics.append(f'{k} {v}')
 
-    # Join all metrics
-    metrics_output = "\n".join(prometheus_metrics) + "\n"
+      # Join all metrics
+      metrics_output = "\n".join(prometheus_metrics) + "\n"
 
-    # Send response.
-    self.send_response(200)
-    self.send_header('Content-type', 'text/plain; version=0.0.4')
-    self.send_header('Access-Control-Allow-Origin', '*')
-    self.end_headers()
-    self.wfile.write(metrics_output.encode('utf-8'))
+      # Send response.
+      self.send_response(200)
+      self.send_header('Content-type', 'text/plain; version=0.0.4')
+      self.send_header('Access-Control-Allow-Origin', '*')
+      self.end_headers()
+      self.wfile.write(metrics_output.encode('utf-8'))
+    elif self.path == '/health':
+      self.send_response(200)
+      self.send_header('Content-type', 'application/json')
+      self.end_headers()
+      self.wfile.write("{'status': 'healthy'}".encode('utf-8'))
+    elif self.path == '/':
+      self.send_response(200)
+      self.send_header('Content-type', 'text/html')
+      self.end_headers()
+      self.wfile.write(b"""
+        <html>
+        <head><title>Docker Services & Containers Metrics</title></head>
+        <body>
+          <h1>Docker Services & Containers Metrics Exporter</h1>
+          <p>Endpoints disponiveis:</p>
+          <ul>
+            <li><a href="/metrics">/metrics</a> - Metricas no formato Prometheus</li>
+            <li><a href="/health">/health</a> - Health Check</li>
+          </ul>
+        </body>
+        </html>
+      """)
+    else:
+      self.send_error(404, "Endpoint not found.")
 
 def main():
   PORT = None
