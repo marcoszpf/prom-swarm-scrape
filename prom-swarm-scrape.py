@@ -5,6 +5,7 @@ import http.server
 import argparse
 import socketserver
 import os
+import sys
 from datetime import datetime, timezone
 
 class MetricsHandler(http.server.BaseHTTPRequestHandler):
@@ -222,7 +223,7 @@ class MetricsHandler(http.server.BaseHTTPRequestHandler):
 def main():
   PORT = None
 
-  parser = argparse.ArgumentParser(description='Use: --leader or --port')
+  parser = argparse.ArgumentParser(description='Use: --port to define a different port.')
   parser.add_argument('--port',
                         type=int,
                         default=9595,
@@ -235,8 +236,9 @@ def main():
   try:
     client = docker.DockerClient(base_url='unix://var/run/docker.sock')
   except docker.errors.DockerException as e:
+    print(f"Can't connect to /var/run/docker.sock (does it exit or is it readable?)")
     print(f"Error connecting to Docker socket: {e}")
-    raise
+    sys.exit(-1)
 
   with socketserver.TCPServer(("", PORT), MetricsHandler) as httpd:
     print(f"Metrics server running on port {PORT}")
