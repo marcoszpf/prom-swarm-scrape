@@ -1,5 +1,9 @@
+## Intro
 
-This scrape gets information of the cluster using the `/var/run/docker.sock` file. It should be deployed to all the machines in the cluster. A Dockerfile is provided for building the image. A systemd service file is also provided to run the scrape as a service.
+This scrape gets information of a Swarm cluster using the `/var/run/docker.sock` socket file. It should be deployed to all the machines in the cluster. A Dockerfile is provided for building the image. A systemd service file is also provided to run the scrape as a service.
+
+If a machine is not on a Swarm Mode so this scrape will only get containers information.
+
 ## Installation
 
 **Docker**
@@ -11,11 +15,37 @@ docker run -p 9595:8080 -v /var/run/docker.sock:/var/run/docker.sock -t prom-swa
 
 Default container port: 8080.
 
+**Swarm**
+
+Recommended way to install in a cluster. First, you must upload the docker image to your private
+repository and adjust the "image" part in the docker-compose.yml.
+
+```bash
+docker stack deploy -c prom_swarm docker-compose.yml
+```
+
+Default port for the service is 9595.
+
 **System**
 
 ```bash
 pip3 install python3-docker
 ./prom-swarm-scrape.py --port 9595 # default port
+```
+
+**Service**
+
+```bash
+sudo mkdir -p /opt/prom-swarm-scrape/
+sudo cp prom-swarm-scrape.py /opt/prom-swarm-scrape/
+sudo cp prom-swarm-scrape.service /etc/systemd/system/
+```
+
+Then:
+
+```bash
+sudo systemctl enable prom-swarm-scrape
+sudo systemctl start prom-swarm-scrape
 ```
 
 ## Prometheus

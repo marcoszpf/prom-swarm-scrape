@@ -3,7 +3,7 @@ services:
     image: prom-swarm-scrape:latest
     ports:
       - target: 8080
-        published: 8888
+        published: 9595
         protocol: tcp
         mode: host
     deploy:
