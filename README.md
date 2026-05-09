@@ -21,7 +21,7 @@ Recommended way to install in a cluster. First, you must upload the docker image
 repository and adjust the "image" part in the docker-compose.yml.
 
 ```bash
-docker stack deploy -c prom_swarm docker-compose.yml
+docker stack deploy -c docker-compose.yml prom_swarm 
 ```
 
 Default port for the service is 9595.
