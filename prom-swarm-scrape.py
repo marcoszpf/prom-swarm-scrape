@@ -10,8 +10,17 @@ from datetime import datetime, timezone
 
 class MetricsHandler(http.server.BaseHTTPRequestHandler):
   def check_if_leader(self):
+    swarm_leader_env = os.environ.get("SWARM_LEADER", None)
+
     try:
       swarm_state = self.server.client.info().get('Swarm', {}).get('LocalNodeState')
+      my_hostname = self.server.client.info().get('Name',None)
+
+      # TODO: Here we respect the env and return True.
+      #       We're not doing further verifications.
+      if (swarm_leader_env and my_hostname) and (swarm_leader_env.lower() == my_hostname.lower()):
+        print(f"INFO: Leader by environment variable (SWARM_LEADER): {swarm_leader_env}")
+        return True
 
       # Make sure the node is stable
       if swarm_state != 'active':
