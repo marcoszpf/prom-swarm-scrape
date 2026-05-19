@@ -88,27 +88,27 @@ class MetricsHandler(http.server.BaseHTTPRequestHandler):
 
       desired = 0
       tasks = service.tasks()
-      tasks_status_complete = 0
+      task_condition_none = False
       if len(tasks) == 0:
         desired = 0
       else:
         for task in tasks:
           if task['DesiredState'] == 'running':
             desired += 1
-          if task['Status']['State'] == 'complete':
-            tasks_status_complete += 1
+          # TODO: Here we consider if the *ANY* task of a service
+          # is condition==none so it's a JOB.
+          if not task_condition_none and 'RestartPolicy' in task['Spec']:
+            task_condition_none = task['Spec']['RestartPolicy']['Condition'] == 'none'
 
       if replicas == desired and replicas == 0:
         status = STOPPED
       elif replicas == desired:
         status = STABLE
-      elif replicas != desired and tasks_status_complete == replicas:
+      elif replicas != desired and task_condition_none == True:
         status = TERMINATED
       else:
         status = UNSTABLE
         metrics_dict['swarm_services_unstable_total'] += 1
-
-      #print((metric_labels['name'], replicas, desired, status))
 
       labels_str = '{' + ', '.join([f'{k}="{metric_labels[k]}"' for k in metric_labels]) + '}'
       prometheus_metrics.append('swarm_services_status' + labels_str + ' ' + str(status))
