@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 27,
+  "id": 0,
   "links": [],
   "panels": [
     {
@@ -734,9 +734,10 @@
                   "job": true,
                   "name": true,
                   "name_short": false,
+                  "node": true,
                   "project": true,
                   "service_name": true,
-                  "stack": false,
+                  "stack": true,
                   "state": true,
                   "swarm_cluster": true,
                   "version": true
@@ -893,6 +894,7 @@
                   "__name__": true,
                   "instance": true,
                   "job": true,
+                  "name": true,
                   "node": true,
                   "service_condition": true,
                   "stack": true,
@@ -901,12 +903,13 @@
                 "includeByName": {},
                 "indexByName": {
                   "Time": 0,
-                  "Value": 8,
+                  "Value": 9,
                   "__name__": 1,
                   "instance": 2,
                   "job": 3,
-                  "service_name": 7,
+                  "name": 7,
                   "node": 4,
+                  "service_name": 8,
                   "stack": 6,
                   "swarm_cluster": 5
                 },
@@ -993,12 +996,12 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Grafana Docker Swarm Cluster v1",
   "uid": "adlsda1a9z",
-  "version": 35
+  "version": 38
 }
